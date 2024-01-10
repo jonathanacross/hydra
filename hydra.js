@@ -1,4 +1,45 @@
 // --------------------------------------------------------------------------
+// Math utility functions
+// --------------------------------------------------------------------------
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
+function gcd(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    if (b > a) { let temp = a; a = b; b = temp; }
+    while (true) {
+        if (b == 0) return a;
+        a %= b;
+        if (a == 0) return b;
+        b %= a;
+    }
+}
+
+function runiform(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function halton(index, base) {
+    let fraction = 1;
+    let result = 0;
+    while (index > 0) {
+        fraction /= base;
+        result += fraction * (index % base);
+        index = ~~(index / base); // floor division
+    }
+    return result;
+}
+
+function* getQuasirandom2DPoint(startidx) {
+    for (let i = startidx + 100; ; i++) {
+        yield [halton(i, 2), halton(i, 3)];
+    }
+}
+
+// --------------------------------------------------------------------------
 // Game logic
 // --------------------------------------------------------------------------
 
@@ -44,34 +85,13 @@ dividing_weapons = [
     { 'op': '/', value: '3', 'name': 'Trisector' }
 ];
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
-function gcd(a, b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-    if (b > a) { let temp = a; a = b; b = temp; }
-    while (true) {
-        if (b == 0) return a;
-        a %= b;
-        if (a == 0) return b;
-        b %= a;
-    }
-}
-
 class Game {
     constructor() {
-        // specific test:
-        // this.num_heads = 52;
-        // this.weapons = [subtracting_weapons[0], adding_weapons[11], dividing_weapons[0]];
-        // this.hp = 20;
-
         this.num_heads = getRandomInt(116) + 5;
         const sub_weapon_idx = getRandomInt(subtracting_weapons.length);
         const sub_weapon = subtracting_weapons[sub_weapon_idx];
 
-        // make sure gcd of + and - weapons is 1, so that
+        // Make sure gcd of + and - weapons is 1, to guarantee that
         // puzzle is solveable.
         let add_weapon_idx = 0;
         let add_weapon = adding_weapons[add_weapon_idx];
@@ -88,7 +108,7 @@ class Game {
         this.weapons = [sub_weapon, add_weapon, div_weapon];
         this.hydra_color = '#' + (Math.random() * 0xFFFFFF << 0).toString(16);
 
-        // set hp = 2x minimal number of moves
+        // Set hp = 2x minimal number of moves.
         const solution = solve(this.num_heads, this.weapons);
         this.optimal_turns = solution.length;
         this.hp = 2 * solution.length
@@ -145,11 +165,11 @@ function winLose(game) {
     const gameElem = document.getElementById("game");
     if (game.num_heads == 0 && game.hp >= 0) {
         if (game.hp == game.optimal_turns) {
-          winLoseElem.innerText = "You are a hydra-slaying expert! You killed the hydra with the fewest hits possible!";
+            winLoseElem.innerText = "You are a hydra-slaying expert! You killed the hydra with the fewest hits possible!";
         } else if (game.hp == 0) {
-          winLoseElem.innerText = "You killed the hydra just in time!";
+            winLoseElem.innerText = "You killed the hydra just in time!";
         } else {
-          winLoseElem.innerText = "Congratulations, you killed the hydra!";
+            winLoseElem.innerText = "Congratulations, you killed the hydra!";
         }
         winLoseElem.style.display = "block";
         gameElem.style.display = "none";
@@ -199,6 +219,10 @@ function newGame() {
     game = new Game();
     refreshPage();
 }
+
+window.onload = function () {
+    newGame();
+};
 
 // --------------------------------------------------------------------------
 // Auto Solving
@@ -258,15 +282,14 @@ function solve(num_heads, weapons) {
     return weaponList;
 }
 
-
 // --------------------------------------------------------------------------
 // Graphics
 // --------------------------------------------------------------------------
+
 function getbody(bodyColor) {
     const svgns = "http://www.w3.org/2000/svg";
 
     const black = "#000000";
-    const red = "#FF0000";
 
     const cx = 125;  // center of body
     const cy = 200;
@@ -284,17 +307,10 @@ function getbody(bodyColor) {
     body.setAttribute('d', "m 53.272227,194.63164 c -0.259322,-33.39636 43.836277,-44.25503 79.007623,-43.82606 26.90708,-0.44941 64.47909,13.20893 68.78596,43.74714 0.52323,9.2808 -3.3823,25.85897 -3.3823,25.85897 0,0 11.51105,-1.54682 22.49887,-10.31203 9.92827,-7.91998 19.88271,-24.23323 19.88271,-24.23323 0,0 -2.0929,28.35803 -15.17364,39.18565 -13.08074,10.82761 -37.14929,14.95243 -37.14929,14.95243 l 1.56969,48.46647 c 0,0 -18.87497,10.50218 -29.30085,10.82761 -4.19099,0.13081 -12.03426,2.578 -12.03426,-3.60921 0,-6.1872 17.26656,-16.49922 17.26656,-16.49922 l -3.6626,-31.45164 c 0,0 -15.69689,4.12481 -31.39377,2.578 -15.69687,-1.5468 -36.868958,-9.75695 -36.868958,-9.75695 l -2.453316,56.67144 c 0,0 -22.418778,1.54939 -29.220758,0.002 -6.48908,-1.47565 -8.37167,-13.40563 -3.139378,-15.46803 5.232294,-2.0624 11.027862,-3.41189 11.027862,-3.41189 l -2.65619,-45.05198 c 0,0 -13.344641,-5.27369 -13.603965,-38.67006 z");
     body.setAttribute('fill', bodyColor);
     body.setAttribute('stroke', black);
-    // const center = document.createElementNS(svgns, 'ellipse');
-    // center.setAttribute('cx', cx);
-    // center.setAttribute('cy', cy);
-    // center.setAttribute('rx', 2);
-    // center.setAttribute('ry', 2);
-    // center.setAttribute('fill', red);
 
     bodygroup.appendChild(leg1);
     bodygroup.appendChild(leg2);
     bodygroup.appendChild(body);
-    // bodygroup.appendChild(center);
 
     return { 'center': [cx, cy], 'element': bodygroup };
 }
@@ -304,7 +320,6 @@ function getrawhead(bodyColor, necklength) {
 
     const white = "#FFFFFF";
     const black = "#000000";
-    const red = "#FF0000";
 
     const cx = 102;  // center of head
     const cy = 78;
@@ -335,19 +350,12 @@ function getrawhead(bodyColor, necklength) {
     eye2.setAttribute('rx', 1.50);
     eye2.setAttribute('ry', 1.62);
     eye2.setAttribute('fill', black);
-    // const center = document.createElementNS(svgns, 'ellipse');
-    // center.setAttribute('cx', cx);
-    // center.setAttribute('cy', cy);
-    // center.setAttribute('rx', 2);
-    // center.setAttribute('ry', 2);
-    // center.setAttribute('fill', red);
 
     headgroup.appendChild(teeth1);
     headgroup.appendChild(teeth2);
     headgroup.appendChild(head);
     headgroup.appendChild(eye1);
     headgroup.appendChild(eye2);
-    // headgroup.appendChild(center);
 
     return { 'center': [cx, cy], 'element': headgroup };
 }
@@ -374,27 +382,6 @@ function drawhead(svg, color, headx, heady, bodyx, bodyy) {
     transformList.appendItem(t2);
 
     svg.appendChild(headelem);
-}
-
-function runiform(min, max) {
-    return Math.random() * (max - min) + min;
-}
-
-function halton(index, base) {
-    let fraction = 1;
-    let result = 0;
-    while (index > 0) {
-        fraction /= base;
-        result += fraction * (index % base);
-        index = ~~(index / base); // floor division
-    }
-    return result;
-}
-
-function* getQuasirandom2DPoint(startidx) {
-    for (let i = startidx + 100; ; i++) {
-        yield [halton(i, 2), halton(i, 3)];
-    }
 }
 
 function drawhydra(svg, color, numheads) {
@@ -434,8 +421,4 @@ function drawhydra(svg, color, numheads) {
         drawhead(svg, color, headx, heady, bodyxoffset, bodyyoffset);
     }
 }
-
-window.onload = function () {
-    newGame();
-};
 
