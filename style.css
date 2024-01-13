@@ -1,3 +1,54 @@
-html {
-    font-family: "Trebuchet MS"
+body {
+    font-family: "Trebuchet MS";
+    background-color: #e0dcf5;
+}
+
+#title {
+    display: inline-block;
+    font-size: 2em;
+    font-weight: bold;
+
+    margin-block-start: 0;
+    margin-block-end: 0.6em;
+    margin-inline-start: 0px;
+}
+
+#newgame {
+    margin-block-start: 0.5em;
+    float: right
+}
+
+#heads {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#hp {
+    font-size: 1.2em;
+    font-weight: bold;
+    float: right
+}
+
+#main {
+    margin-top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 320px;
+    border: 3px solid #746f8f;
+    padding: 20px;
+    background-color: #fbfaff;
+}
+
+#game {
+    display: flex;
+    align-items: center;
+}
+
+#hydra {
+    margin: auto;
+    display: block;
+}
+
+#soln {
+    display: none;
 }

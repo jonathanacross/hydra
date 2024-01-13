@@ -7,22 +7,26 @@
 </head>
 
 <body>
-    <h1>Hydra</h1>
-    <div id="winlose"></div>
-    <button id="newgame" onclick="newGame()">New Game</button>
-    <div id="game">
-        <h3>
-            <span id="heads">Heads: </span>
-            <span id="hp">Your HP: </span>
-        </h3>
-        <svg id="hydra" width="270" height="300"></svg>
-        <p>What weapon will you attack with?</p>
+    <div id="main">
         <div>
-            <button id="weapon1" onclick="updateHeads(0)">Weapon 1</button>
-            <button id="weapon2" onclick="updateHeads(1)">Weapon 2</button>
-            <button id="weapon3" onclick="updateHeads(2)">Weapon 3</button>
+            <h1 id="title">Hydra</h1>
+            <button id="newgame" onclick="newGame()">New Game</button>
         </div>
-        <h4 id="soln"></h4>
+        <div id="winlose"></div>
+        <div id="game">
+            <div>
+                <span id="heads">Heads: </span>
+                <span id="hp">Your HP: </span>
+            </div>
+            <svg id="hydra" width="270" height="300"></svg>
+            <p>What weapon will you attack with?</p>
+            <div>
+                <button id="weapon1" onclick="updateHeads(0)">Weapon 1</button>
+                <button id="weapon2" onclick="updateHeads(1)">Weapon 2</button>
+                <button id="weapon3" onclick="updateHeads(2)">Weapon 3</button>
+            </div>
+            <p id="soln"></p>
+        </div>
     </div>
 </body>
 
