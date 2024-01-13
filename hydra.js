@@ -6,18 +6,6 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
-function gcd(a, b) {
-    a = Math.abs(a);
-    b = Math.abs(b);
-    if (b > a) { let temp = a; a = b; b = temp; }
-    while (true) {
-        if (b == 0) return a;
-        a %= b;
-        if (a == 0) return b;
-        b %= a;
-    }
-}
-
 function runiform(min, max) {
     return Math.random() * (max - min) + min;
 }
@@ -36,6 +24,18 @@ function halton(index, base) {
 function* getQuasirandom2DPoint(startidx) {
     for (let i = startidx + 100; ; i++) {
         yield [halton(i, 2), halton(i, 3)];
+    }
+}
+
+function gcd(a, b) {
+    a = Math.abs(a);
+    b = Math.abs(b);
+    if (b > a) { let temp = a; a = b; b = temp; }
+    while (true) {
+        if (b == 0) return a;
+        a %= b;
+        if (a == 0) return b;
+        b %= a;
     }
 }
 
@@ -286,9 +286,9 @@ function solve(num_heads, weapons) {
 // Graphics
 // --------------------------------------------------------------------------
 
-function getbody(bodyColor) {
-    const svgns = "http://www.w3.org/2000/svg";
+const svgns = "http://www.w3.org/2000/svg";
 
+function getbody(bodyColor) {
     const black = "#000000";
 
     const cx = 125;  // center of body
@@ -316,8 +316,6 @@ function getbody(bodyColor) {
 }
 
 function getrawhead(bodyColor, necklength) {
-    const svgns = "http://www.w3.org/2000/svg";
-
     const white = "#FFFFFF";
     const black = "#000000";
 
@@ -360,7 +358,7 @@ function getrawhead(bodyColor, necklength) {
     return { 'center': [cx, cy], 'element': headgroup };
 }
 
-function drawhead(svg, color, headx, heady, bodyx, bodyy) {
+function drawhead(svg, hydra_group, color, headx, heady, bodyx, bodyy) {
     const dx = headx - bodyx;
     const dy = heady - bodyy;
     const r = Math.sqrt(dx * dx + dy * dy);
@@ -381,21 +379,23 @@ function drawhead(svg, color, headx, heady, bodyx, bodyy) {
     transformList.appendItem(t1);
     transformList.appendItem(t2);
 
-    svg.appendChild(headelem);
+    hydra_group.appendChild(headelem);
 }
 
 function drawhydra(svg, color, numheads) {
-    let body = getbody(color);
-    const bodyelement = body['element'];
-    const bodyx = body['center'][0];
-    const bodyy = body['center'][1];
-
     // clear any previous stuff
     while (svg.firstChild) {
         svg.removeChild(svg.lastChild);
     }
 
-    svg.appendChild(bodyelement);
+    const hydra_group = document.createElementNS(svgns, 'g');
+    svg.appendChild(hydra_group);
+
+    let body = getbody(color);
+    const bodyelement = body['element'];
+    const bodyx = body['center'][0];
+    const bodyy = body['center'][1];
+    hydra_group.appendChild(bodyelement);
 
     // determine head locations
     const seed = getRandomInt(1000);
@@ -418,7 +418,13 @@ function drawhydra(svg, color, numheads) {
         const heady = headlocs[i][1] * 130 + 50;
         const bodyxoffset = headlocs[i][0] * 140 - 70 + bodyx;
         const bodyyoffset = headlocs[i][1] * 40 - 40 + bodyy;
-        drawhead(svg, color, headx, heady, bodyxoffset, bodyyoffset);
+        drawhead(svg, hydra_group, color, headx, heady, bodyxoffset, bodyyoffset);
     }
+
+    // Shift everything up a little bit.
+    let t1 = svg.createSVGTransform();
+    t1.setTranslate(0, -20);
+    const transformList = hydra_group.transform.baseVal;
+    transformList.appendItem(t1);
 }
 
